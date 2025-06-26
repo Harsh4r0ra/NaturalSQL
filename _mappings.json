@@ -1,0 +1,115 @@
+{
+  "field_mappings": {
+    "basic_info": {
+      "entity_name": {
+        "table": "MAIN_TABLE",
+        "column": "name",
+        "description": "Primary entity identifier",
+        "keywords": [
+          "name",
+          "entity name",
+          "identifier"
+        ]
+      },
+      "status": {
+        "table": "MAIN_TABLE",
+        "column": "status",
+        "description": "Current status",
+        "keywords": [
+          "status",
+          "current status",
+          "state"
+        ]
+      },
+      "date_created": {
+        "table": "MAIN_TABLE",
+        "column": "created_date",
+        "description": "Creation date",
+        "keywords": [
+          "created",
+          "creation date",
+          "start date"
+        ]
+      }
+    },
+    "personnel": {
+      "manager": {
+        "table": "PERSONNEL_TABLE",
+        "column": "manager_name",
+        "description": "Assigned manager",
+        "keywords": [
+          "manager",
+          "supervisor",
+          "lead"
+        ]
+      },
+      "engineer": {
+        "table": "PERSONNEL_TABLE",
+        "column": "engineer_name",
+        "description": "Assigned engineer",
+        "keywords": [
+          "engineer",
+          "technical lead",
+          "specialist"
+        ]
+      }
+    },
+    "metrics": {
+      "current_value": {
+        "table": "METRICS_TABLE",
+        "column": "current_value",
+        "description": "Current measured value",
+        "keywords": [
+          "current value",
+          "measurement",
+          "reading"
+        ]
+      },
+      "target_value": {
+        "table": "METRICS_TABLE",
+        "column": "target_value",
+        "description": "Target or planned value",
+        "keywords": [
+          "target",
+          "goal",
+          "planned value"
+        ]
+      }
+    }
+  },
+  "table_relationships": {
+    "primary_joins": {
+      "main_to_personnel": "MAIN_TABLE.id = PERSONNEL_TABLE.entity_id",
+      "main_to_metrics": "MAIN_TABLE.id = METRICS_TABLE.entity_id"
+    },
+    "common_filters": {
+      "by_name": "MAIN_TABLE.name = 'ENTITY_NAME'",
+      "by_status": "MAIN_TABLE.status = 'STATUS_VALUE'",
+      "latest_data": "METRICS_TABLE.date_recorded = (SELECT MAX(date_recorded) FROM METRICS_TABLE WHERE entity_id = MAIN_TABLE.id)"
+    }
+  },
+  "query_patterns": {
+    "status_by_entity": {
+      "description": "Get status for a specific entity",
+      "sql_template": "SELECT m.name, m.status FROM MAIN_TABLE m WHERE m.name = '{entity_name}'",
+      "required_tables": [
+        "MAIN_TABLE"
+      ],
+      "join_fields": [
+        "id"
+      ]
+    },
+    "personnel_by_entity": {
+      "description": "Get personnel assignments for a specific entity",
+      "sql_template": "SELECT m.name, p.manager_name, p.engineer_name FROM MAIN_TABLE m INNER JOIN PERSONNEL_TABLE p ON m.id = p.entity_id WHERE m.name = '{entity_name}'",
+      "required_tables": [
+        "MAIN_TABLE",
+        "PERSONNEL_TABLE"
+      ],
+      "join_fields": [
+        "id",
+        "entity_id"
+      ]
+    }
+  }
+}
